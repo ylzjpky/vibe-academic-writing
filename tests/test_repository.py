@@ -7,21 +7,31 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILL = ROOT / "skills" / "develop-academic-paper"
+PLUGIN = ROOT / "plugins" / "vibe-academic-writing"
+SKILL = PLUGIN / "skills" / "develop-academic-paper"
 
 
 class RepositoryTests(unittest.TestCase):
     def test_required_project_files_exist(self) -> None:
         for relative in (
             "README.md",
+            "README.zh-CN.md",
             "LICENSE",
             "SECURITY.md",
             "CONTRIBUTING.md",
             "CHANGELOG.md",
-            "skills/develop-academic-paper/SKILL.md",
-            "skills/develop-academic-paper/LICENSE.txt",
+            ".agents/plugins/marketplace.json",
+            "plugins/vibe-academic-writing/.codex-plugin/plugin.json",
+            "plugins/vibe-academic-writing/skills/develop-academic-paper/SKILL.md",
+            "plugins/vibe-academic-writing/skills/develop-academic-paper/LICENSE.txt",
         ):
             self.assertTrue((ROOT / relative).is_file(), relative)
+
+    def test_readme_language_switches(self) -> None:
+        english = (ROOT / "README.md").read_text(encoding="utf-8")
+        chinese = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        self.assertIn("[简体中文](README.zh-CN.md)", english)
+        self.assertIn("[English](README.md)", chinese)
 
     def test_skill_frontmatter_is_minimal_and_valid(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
@@ -33,6 +43,35 @@ class RepositoryTests(unittest.TestCase):
                 keys.append(line.split(":", 1)[0])
         self.assertEqual(keys, ["name", "description"])
         self.assertIn("name: develop-academic-paper", match.group(1))
+
+    def test_plugin_and_marketplace_identity_match(self) -> None:
+        plugin = json.loads(
+            (PLUGIN / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
+        )
+        marketplace = json.loads(
+            (ROOT / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(plugin["name"], "vibe-academic-writing")
+        self.assertEqual(plugin["version"], "1.3.0")
+        self.assertRegex(plugin["version"], r"^\d+\.\d+\.\d+$")
+        self.assertEqual(plugin["skills"], "./skills/")
+        self.assertTrue((PLUGIN / plugin["skills"]).is_dir())
+        for key in (
+            "displayName",
+            "shortDescription",
+            "longDescription",
+            "developerName",
+            "category",
+            "capabilities",
+            "defaultPrompt",
+        ):
+            self.assertIn(key, plugin["interface"])
+        self.assertEqual(len(marketplace["plugins"]), 1)
+        entry = marketplace["plugins"][0]
+        self.assertEqual(entry["name"], plugin["name"])
+        self.assertEqual(entry["source"]["path"], "./plugins/vibe-academic-writing")
+        self.assertTrue((ROOT / entry["source"]["path"]).is_dir())
+        self.assertFalse((ROOT / "skills" / "develop-academic-paper").exists())
 
     def test_json_assets_parse(self) -> None:
         paths = list(SKILL.rglob("*.json"))

@@ -21,6 +21,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Runtime regression suite
-        run: python -B skills/develop-academic-paper/scripts/self_test.py
+        run: python -B plugins/vibe-academic-writing/skills/develop-academic-paper/scripts/self_test.py
       - name: Repository validation
         run: python -B -m unittest discover -s tests -v

@@ -2,7 +2,7 @@
 
 | Platform | Status | Notes |
 | --- | --- | --- |
-| Codex | Tested | Primary target; includes `agents/openai.yaml`. |
+| Codex | Tested | Primary target; includes a marketplace catalog, plugin manifest, and `agents/openai.yaml`. |
 | Agent Skills-compatible clients | Experimental | The core `SKILL.md`, `scripts`, `references`, and `assets` layout is portable, but tool and browser behavior varies. |
 | Claude Code | Not yet verified | No `.claude-plugin` manifest is included. |
 | Cursor | Not yet verified | No Cursor-specific adapter is included. |

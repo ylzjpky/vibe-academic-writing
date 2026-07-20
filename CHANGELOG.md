@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented here. Versions follow Semantic Versioning.
 
+## [1.3.0] - 2026-07-21
+
+### Added
+
+- Codex plugin manifest for marketplace installation.
+- Repository marketplace catalog for address-based installation.
+- Full English and Simplified Chinese READMEs with marketplace, manual fallback, workflow, differentiation, safety, and verification guidance.
+- Repository tests that keep plugin, marketplace, and Skill identities aligned.
+
+### Changed
+
+- Moved the runtime Skill under the canonical plugin directory.
+- Updated CI and contributor commands for the plugin-backed layout.
+
 ## [1.2.0] - 2026-07-20
 
 ### Added

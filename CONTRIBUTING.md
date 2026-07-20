@@ -16,7 +16,7 @@ Thank you for contributing to Vibe Academic Writing.
 Run:
 
 ```bash
-python -B skills/develop-academic-paper/scripts/self_test.py
+python -B plugins/vibe-academic-writing/skills/develop-academic-paper/scripts/self_test.py
 python -B -m unittest discover -s tests -v
 ```
 

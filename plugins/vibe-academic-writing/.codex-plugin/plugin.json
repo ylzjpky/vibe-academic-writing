@@ -1,0 +1,40 @@
+{
+  "name": "vibe-academic-writing",
+  "version": "1.3.0",
+  "description": "Source-grounded academic research, course synchronization, writing, citation, review, and delivery workflows.",
+  "author": {
+    "name": "Vibe Academic Writing contributors",
+    "url": "https://github.com/ylzjpky/vibe-academic-writing"
+  },
+  "homepage": "https://github.com/ylzjpky/vibe-academic-writing#readme",
+  "repository": "https://github.com/ylzjpky/vibe-academic-writing",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "academic-writing",
+    "academic-research",
+    "citations",
+    "course-materials"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Vibe Academic Writing",
+    "shortDescription": "Research, cite, write, review, and sync coursework.",
+    "longDescription": "Plan and complete source-grounded academic assignments, synchronize authorized course materials, audit evidence and citations, and deliver reviewed Word or PDF outputs.",
+    "developerName": "Vibe Academic Writing contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Academic research",
+      "Course synchronization",
+      "Citation auditing",
+      "Document delivery"
+    ],
+    "websiteURL": "https://github.com/ylzjpky/vibe-academic-writing",
+    "privacyPolicyURL": "https://github.com/ylzjpky/vibe-academic-writing/blob/main/docs/privacy-and-security.md",
+    "defaultPrompt": [
+      "Help me start a source-grounded academic assignment.",
+      "Synchronize one authorized course's available materials.",
+      "Audit my draft's evidence and citations."
+    ]
+  }
+}

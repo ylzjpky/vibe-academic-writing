@@ -1,14 +1,16 @@
 # Architecture
 
-Vibe Academic Writing separates a compact runtime skill from repository documentation and validation.
+Vibe Academic Writing separates a marketplace-installable plugin wrapper, a compact runtime skill, and repository documentation and validation.
 
 ## Runtime layers
 
-1. `SKILL.md` provides routing rules, invariants, checkpoints, and the core workflow.
-2. `references/` contains conditionally loaded procedures and policies.
-3. `scripts/` performs deterministic state, validation, synchronization, and safety operations without consuming model context for implementation details.
-4. `assets/workspace-templates/` defines reusable initial workspace records.
-5. `agents/openai.yaml` contains OpenAI-facing display metadata and a default invocation prompt.
+1. `.agents/plugins/marketplace.json` exposes the repository as a Codex marketplace.
+2. `plugins/vibe-academic-writing/.codex-plugin/plugin.json` identifies the installable plugin and its Skill path.
+3. `SKILL.md` provides routing rules, invariants, checkpoints, and the core workflow.
+4. `references/` contains conditionally loaded procedures and policies.
+5. `scripts/` performs deterministic state, validation, synchronization, and safety operations without consuming model context for implementation details.
+6. `assets/workspace-templates/` defines reusable initial workspace records.
+7. `agents/openai.yaml` contains OpenAI-facing display metadata and a default invocation prompt.
 
 The main agent owns user decisions, authenticated browser control, conflict resolution, and final synthesis. Subagents may process bounded local artifacts, but only one agent may control an authenticated browser at a time.
 
