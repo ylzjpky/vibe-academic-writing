@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.*
+secrets.*
+
+# Private workspaces and authenticated-session artifacts
+workspaces/
+downloads/
+private-materials/
+test-output/
+run_state.json
+resume_state.json
+events.jsonl
+workspace_config.json
+course_catalog.json
+course_manifest.json
+remote_inventory.json
+local_inventory.json
+sync_state.json
+missing_materials.md
+*_result/
+
+# Archives and local release output
+dist/
+build/
+*.zip

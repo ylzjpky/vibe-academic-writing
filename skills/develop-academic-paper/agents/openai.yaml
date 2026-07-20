@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Academic Paper"
+  short_description: "Adapt briefs, research, draft, cite, and export coursework"
+  default_prompt: "Use $develop-academic-paper to interpret my assignment materials, research and draft the task, review it, and export the final result."

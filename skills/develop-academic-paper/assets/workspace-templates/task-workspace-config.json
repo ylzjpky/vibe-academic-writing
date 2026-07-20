@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.2",
+  "workspace_mode": "single_task",
+  "workspace_language": "en",
+  "artifact_language": "English",
+  "default_citation_style": null,
+  "created_at": null,
+  "task_root_layout": "named_subdirectory",
+  "credential_storage": "prohibited",
+  "cloud_sync_acknowledgement": null,
+  "security_defaults": {
+    "max_files_per_sync": 500,
+    "max_file_bytes": 536870912,
+    "max_total_bytes": 2147483648,
+    "macro_enabled_office_files": "prohibited_without_manual_review",
+    "automatic_archive_extraction": "prohibited",
+    "retention_policy": "user_managed_no_automatic_deletion",
+    "default_share_scope": "result_directory_only",
+    "licensed_material_external_sharing": "prohibited_without_authorization"
+  },
+  "updated_at": null
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.2",
+  "workspace_mode": "course",
+  "workspace_language": "en",
+  "artifact_language": "English",
+  "default_citation_style": null,
+  "institution_name": null,
+  "dashboard_url": null,
+  "include_archived_courses": false,
+  "video_download_policy": "exclude",
+  "slide_citation_policy": "prohibited",
+  "credential_storage": "prohibited",
+  "cloud_sync_acknowledgement": null,
+  "security_defaults": {
+    "max_files_per_sync": 500,
+    "max_file_bytes": 536870912,
+    "max_total_bytes": 2147483648,
+    "macro_enabled_office_files": "prohibited_without_manual_review",
+    "automatic_archive_extraction": "prohibited",
+    "retention_policy": "user_managed_no_automatic_deletion",
+    "default_share_scope": "result_directory_only",
+    "licensed_material_external_sharing": "prohibited_without_authorization"
+  },
+  "created_at": null,
+  "updated_at": null
+}

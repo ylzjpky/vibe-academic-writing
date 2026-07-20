@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "Vibe Academic Writing"
+type: software
+version: 1.2.0
+date-released: 2026-07-20
+license: MIT
+authors:
+  - name: "Vibe Academic Writing contributors"
+repository-code: "https://github.com/ylzjpky/vibe-academic-writing"
+url: "https://github.com/ylzjpky/vibe-academic-writing"
+keywords:
+  - agent-skills
+  - academic-writing
+  - research-workflow
+  - citation-audit
+  - course-materials
