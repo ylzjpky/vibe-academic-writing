@@ -16,16 +16,16 @@ Default retention is user-managed: never delete course/source files automaticall
 
 - The user performs password, passkey, MFA, recovery, consent, and CAPTCHA steps in the site UI.
 - Never place credentials, cookies, authorization headers, signed URLs, proxy tokens, or local usernames in prompts, handoffs, artifacts, or events.
-- Use one browser owner and one navigation/download at a time. Acquire `browser.lock` with `browser_lock.py`, renew it during a long active run, and release it when pausing or finishing.
+- Follow `browser-access.md` for built-in, CDP and computer control. Use one browser owner and one navigation/download at a time. Acquire `browser.lock` with `browser_lock.py` in the shared workspace lock directory, renew it during a long active run, and release it when pausing or finishing. A backend switch keeps the same owner and revalidates the target; it does not remove access or rate-limit blockers.
 - Operate at a normal interactive pace. Do not parallelize pages or downloads, enumerate hidden endpoints, rotate identities, imitate another client, or use direct endpoints not exposed by the normal interface.
-- Pause 2–5 seconds between automated page transitions unless the site itself controls timing. Site limits override this default.
+- Prefer the runtime's navigation/readiness waits and a fresh page observation to fixed sleeps. Honor site pacing and rate limits; use a delay only when required by the site or when no readiness signal is available.
 - Stop on CAPTCHA, unusual-login warnings, consent changes, session expiry, `401`, `403`, or `429`. Do not automatically retry these conditions.
 - Retry only transient connection or `5xx` failures, at most twice, with increasing delays such as 5 and 15 seconds. If the same operation still fails, record it and continue only where independent work is safe.
 - A generic skill cannot guarantee that an institution will not flag automation. When terms or permitted behavior are unclear, stop and ask the user to use a manual export.
 
 ## Download handling
 
-Snapshot the download directory before each action and move only newly created files that match the intended item. Verify file name/identity, non-zero size, expected signature, and hash. A browser click or success banner is not sufficient.
+Use a documented download event/path when available; otherwise snapshot the confirmed download directory before each action and move only newly created files that match the intended item. Wait for completion and record `download_map.json` with relative paths. Verify file name/identity, non-zero size, expected signature, and hash. Partial files such as `.crdownload` and `.part` fail verification. A browser click or success banner is not sufficient.
 
 Never execute downloaded scripts or macros. Treat `.docm`, `.xlsm`, `.pptm`, and related macro-enabled Office files as `unsafe_macro`. Treat archives as `archive_requires_review`; do not extract them automatically. Do not open active content merely to inspect it. Use platform malware scanning when available, but never describe a signature/hash check as a malware scan.
 

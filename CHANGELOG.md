@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented here. Versions follow Semantic Versioning.
 
+## [Unreleased]
+
+### Added
+
+- Browser execution procedures for Codex's built-in browser, authorized CDP, and enabled user-computer control, with capability discovery and session-aware fallback.
+- Download-event and native-directory workflows, plus explicit remote-to-local download mapping.
+- Regression coverage for same-name files, browser-renamed downloads, partial downloads, external mapping paths, and historical remote timestamps.
+
+### Fixed
+
+- Download verification now preserves remote identity, original name and modification time, rejects ambiguous/reused file matches, and does not mark partial browser files verified.
+- Resynchronization uses historical remote modification timestamps when older local inventories lack them and does not substitute a different stable identity by filename.
+
 ## [1.3.0] - 2026-07-21
 
 ### Added

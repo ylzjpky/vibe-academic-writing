@@ -5,8 +5,9 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+from pathlib import Path, PureWindowsPath
 
-from _common import SCHEMA_VERSION, inventory_file, material_policy, now_utc, read_records, resolve_explicit, workspace_relative, write_json, write_text
+from _common import SCHEMA_VERSION, ensure_under, inventory_file, material_policy, no_credentials, normalized_name, now_utc, pick_match, read_records, redact_url, resolve_explicit, workspace_relative, write_json, write_text
 
 
 def parser() -> argparse.ArgumentParser:
@@ -14,6 +15,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("download_directory", help="Explicit local download directory")
     value.add_argument("output_directory", help="Directory for verification outputs")
     value.add_argument("--expected", help="Optional normalized remote inventory JSON/CSV")
+    value.add_argument("--download-map", help="JSON/CSV associating remote_item_id/name with a download-directory-relative local_path")
     value.add_argument("--workspace-root", help="Workspace root used to persist relative paths")
     value.add_argument("--max-files", type=int, default=500)
     value.add_argument("--max-file-bytes", type=int, default=512 * 1024 * 1024)
@@ -52,6 +54,10 @@ def write_missing(path, rows) -> None:
 
 def main() -> int:
     args = parser().parse_args()
+    if args.download_map and not args.expected:
+        raise SystemExit("--download-map requires --expected")
+    if min(args.max_files, args.max_file_bytes, args.max_total_bytes) < 1:
+        raise SystemExit("Download limits must be positive integers")
     root = resolve_explicit(args.download_directory)
     output = resolve_explicit(args.output_directory)
     if not root.is_dir():
@@ -100,15 +106,39 @@ def main() -> int:
         "item_count": len(local),
         "materials": local,
     }
-    write_json(output / "local_inventory.json", local_document)
     rows = []
     if args.expected:
         expected = read_records(resolve_explicit(args.expected))
-        local_by_name = {str(item["name"]).casefold(): item for item in local}
+        no_credentials(expected)
+        download_map = read_records(resolve_explicit(args.download_map)) if args.download_map else []
+        no_credentials(download_map)
+        mapped_paths: set[str] = set()
+        mapped_ids: set[str] = set()
+        for mapping in download_map:
+            relative_path = str(mapping.get("local_path") or "").replace("\\", "/")
+            if Path(relative_path).anchor or PureWindowsPath(relative_path).anchor:
+                raise SystemExit("Download-map paths must be relative to the download directory")
+            mapped_path = root / relative_path
+            ensure_under(mapped_path, root)
+            if not mapping.get("local_path") or mapped_path == root:
+                raise SystemExit("Each download-map row requires a file local_path")
+            mapping["local_path"] = mapped_path.resolve().relative_to(root).as_posix()
+            remote_id = str(mapping.get("remote_item_id") or mapping.get("remote_id") or "")
+            if mapping["local_path"] in mapped_paths or (remote_id and remote_id in mapped_ids):
+                raise SystemExit("Download-map rows must have unique local paths and remote IDs")
+            mapped_paths.add(mapping["local_path"])
+            if remote_id:
+                mapped_ids.add(remote_id)
+            for item in local:
+                if item["local_path"] == mapping["local_path"]:
+                    item.update({field: mapping[field] for field in ("remote_item_id", "remote_id", "clean_url", "url", "dashboard_path", "module_path") if mapping.get(field)})
+        used: set[int] = set()
+        used_mappings: set[int] = set()
+        name_counts = Counter(normalized_name(item.get("name")) for item in expected)
         for remote in expected:
             name = str(remote.get("name") or "")
             material_type = str(remote.get("material_type") or remote.get("type") or "unknown")
-            remote_url = str(remote.get("clean_url") or remote.get("url") or "")
+            remote_url = redact_url(str(remote.get("clean_url") or remote.get("url") or ""))
             availability = str(remote.get("availability") or "available").lower()
             eligible = remote.get("download_eligible") is not False
             record_role = str(remote.get("record_role") or "downloadable_file")
@@ -131,7 +161,17 @@ def main() -> int:
                     }
                 )
                 continue
-            item = local_by_name.get(name.casefold())
+            mapping_index = pick_match(remote, download_map, used_mappings)
+            match_record = dict(remote)
+            if mapping_index is not None:
+                used_mappings.add(mapping_index)
+                match_record["local_path"] = download_map[mapping_index]["local_path"]
+            match_index = pick_match(match_record, local, used)
+            if not match_record.get("local_path") and name_counts[normalized_name(name)] > 1:
+                match_index = None
+            item = local[match_index] if match_index is not None else None
+            if match_index is not None:
+                used.add(match_index)
             if item is None:
                 rows.append(
                     {
@@ -141,13 +181,13 @@ def main() -> int:
                         "local_path": "",
                         "material_type": material_type,
                         "url": remote_url,
-                        "reason": "Expected download was not found",
+                        "reason": "No unique local match; provide a download map for renamed or same-name files",
                     }
                 )
             else:
                 status = item["integrity_status"]
                 policy = material_policy(
-                    root / name,
+                    root / item["local_path"],
                     str(remote.get("original_material_type") or remote.get("material_type") or remote.get("type") or ""),
                 )
                 if status == "verified" and remote.get("size_bytes") not in (None, "") and int(remote["size_bytes"]) != int(item["size_bytes"]):
@@ -158,9 +198,21 @@ def main() -> int:
                     reason = "Downloaded SHA-256 differs from remote inventory"
                 else:
                     reason = item["integrity_reason"]
+                item.update({
+                    "remote_item_id": remote.get("remote_item_id") or remote.get("remote_id") or "",
+                    "remote_name": name,
+                    "dashboard_path": remote.get("dashboard_path") or "",
+                    "module_path": remote.get("module_path") or "",
+                    "clean_url": remote_url,
+                    "remote_modified_at": remote.get("modified_at") or "",
+                    "integrity_status": status,
+                    "integrity_reason": reason,
+                    **policy,
+                })
                 rows.append(
                     {
                         "name": name,
+                        "remote_item_id": item["remote_item_id"],
                         "status": status,
                         "dashboard_path": remote.get("dashboard_path") or "",
                         "local_path": item["local_path"],
@@ -186,6 +238,7 @@ def main() -> int:
             }
             for item in local
         ]
+    write_json(output / "local_inventory.json", local_document)
     counts = Counter(row["status"] for row in rows)
     report = {
         "schema_version": SCHEMA_VERSION,

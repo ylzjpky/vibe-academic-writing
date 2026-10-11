@@ -63,7 +63,7 @@ Keep original source files unchanged. Store derived notes separately.
 3. Derive search questions from the assignment, not from a predetermined conclusion.
 4. Separate `source_scope` from `external_access`. If external retrieval is needed, ask whether to use the institutional library, public scholarly sources, or both.
 5. Search only the selected authorized channels. Treat discovery-index records as leads until the full source is retrieved and verified.
-6. Apply `safety-and-recovery.md`; acquire the browser lock and require the user to perform password, MFA, CAPTCHA, or consent steps.
+6. Follow `browser-access.md` for built-in browser, CDP, or enabled computer control; apply `safety-and-recovery.md`, acquire the shared browser lock, and let the user perform password, MFA, CAPTCHA, or consent steps.
 7. Download only material within the user's authorized access and configured limits. Stop on authentication, permission, CAPTCHA, or rate-limit signals.
 8. Preserve source provenance: title, author, date, publisher or venue, stable identifier, retrieval location, local path, and verification status.
 9. Separate `verified`, `rejected`, and `unresolved` sources. Do not cite an unresolved source as verified fact.

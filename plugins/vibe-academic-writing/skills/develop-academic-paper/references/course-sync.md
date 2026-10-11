@@ -1,6 +1,6 @@
 # Course material synchronization
 
-Use this workflow after the course-list page gate, catalog confirmation, and workspace preflight. Support `first_sync`, lightweight `resync`, and user-requested `deep_resync`. Control one LMS browser session sequentially under `browser.lock`; parallelize only local, read-only verification when safe. Apply the limits and stop/retry rules in `safety-and-recovery.md`.
+Use this workflow after the course-list page gate, catalog confirmation, and workspace preflight. Select built-in browser, CDP, or enabled computer control with `browser-access.md` and verify local download access before enumeration. Support `first_sync`, lightweight `resync`, and user-requested `deep_resync`. Control one LMS browser session sequentially under the shared `browser.lock`; parallelize only local, read-only verification when safe. Apply the limits and stop/retry rules in `safety-and-recovery.md`.
 
 ## Contents
 
@@ -48,12 +48,12 @@ For each confirmed course, sequentially:
 1. Open the course and verify that its displayed name or stable ID matches the target manifest.
 2. Enumerate all in-scope material areas and write the remote inventory before bulk downloading.
 3. Exclude videos and record them without downloading.
-4. Download each eligible non-video item to a controlled incoming directory when possible.
+4. Download each eligible non-video item to a controlled incoming directory using the selected backend's documented event/path or directory-snapshot method. Arm download observation before clicking and reconcile unknown outcomes before retrying.
 5. If downloads must enter the browser's default download directory, snapshot its inventory first and move only files created by the current action.
 6. Verify each file by existence, nonzero size, expected type or signature, readable container, and association with the intended remote item.
 7. Move verified files into `01_course_materials/` while reproducing the LMS hierarchy.
-8. Keep original names when safe. Resolve collisions with stable IDs or deterministic suffixes; record the mapping.
-9. Generate the local inventory with paths, sizes, modification times, hashes when practical, and verification status.
+8. Keep original names when safe. Resolve collisions with stable IDs or deterministic suffixes; record the actual relative local path in `download_map.json` and update it after organizing files. Pass it to `verify_downloads.py --download-map` so browser-renamed and same-name files remain associated with their remote items.
+9. Preserve the verifier's local inventory with paths, sizes, hashes, verification status, remote IDs, original remote names, breadcrumbs, clean URLs, and remote modification timestamps. A fresh filename-only scan must not replace this identity information.
 10. Compare remote eligible items with verified local files.
 11. Write the sync state, history, summary, and missing-material report.
 
@@ -63,12 +63,12 @@ Create/update the operation `run_state.json` at each numbered checkpoint. Stop b
 
 Default to a page-and-metadata scan. Read the previous remote inventory and current local inventory, scan the course hierarchy again, and write a fresh complete remote inventory. Do not open, extract, OCR, hash, or redownload unchanged remote files. Compare deterministically before any download and match in this order:
 
-1. stable remote item ID;
-2. canonical URL without secret or volatile parameters;
-3. dashboard path plus original name;
-4. name plus remote size;
-5. name plus module path;
-6. verified local hash for previously downloaded versions.
+1. a recorded relative local path, with no conflicting stable identity;
+2. stable remote item ID;
+3. canonical URL without secret or volatile parameters;
+4. original name, disambiguated by dashboard/module path and remote size.
+
+An explicit local path is authoritative; never substitute a different same-name file when that path is missing. Conflicting stable IDs cannot match by name. An ambiguous match remains unresolved. Pass `--previous-remote` to `compare_course_sync.py`; it uses the previous modification timestamp when an older local inventory lacks `remote_modified_at`. Compare hashes only when already recorded or when changed/ambiguous content needs verification.
 
 Assign one status per item:
 

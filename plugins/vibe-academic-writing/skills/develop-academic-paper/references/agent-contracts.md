@@ -47,7 +47,7 @@ Extract requirements from chat and uploaded briefs, record field provenance, cla
 
 ### Browser/LMS Navigator
 
-The only agent allowed to control the browser in a run. Acquire `browser.lock` with `scripts/browser_lock.py`, verify the correct course-list or database page, navigate sequentially, inventory remote items, and initiate authorized downloads. Never handle or store credentials; pause for user-entered password/MFA/CAPTCHA. Release the lock when blocked, paused, or complete.
+The only agent allowed to control the browser or its native computer window in a run. Follow `browser-access.md` for built-in, CDP, or enabled computer control and capability-based fallback. Acquire the shared `browser.lock` with `scripts/browser_lock.py`, verify the correct course-list or database page, navigate sequentially, inventory remote items, and receive authorized downloads with explicit local associations. Never handle or store credentials; pause for user-entered password/MFA/CAPTCHA. Release the lock when blocked, paused, or complete.
 
 ### Course Sync Worker
 

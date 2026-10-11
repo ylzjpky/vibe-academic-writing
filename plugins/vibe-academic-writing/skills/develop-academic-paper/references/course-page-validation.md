@@ -2,6 +2,8 @@
 
 Apply this gate before reading a course catalog, counting courses, creating course directories, or synchronizing materials. Treat failure or uncertainty as blocking.
 
+Select the actual browser/computer surface with `browser-access.md` first. Recheck the target site and course whenever the tab, window, profile, or backend changes. Read complete in-scope lists, including pagination, expanded modules, frames and lazy-loaded rows; a login page or partially rendered list is not an empty catalog.
+
 ## User-controlled authentication
 
 1. Ask the user to open the institution dashboard and complete sign-in, MFA, CAPTCHA, consent, and account-selection steps.

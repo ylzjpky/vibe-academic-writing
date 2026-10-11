@@ -1,6 +1,6 @@
 # Institutional E-Library Workflow
 
-Use this workflow only for resources the user is authorized to access. Apply `safety-and-recovery.md`, including browser locking, stop/retry rules, storage preflight, and download caps. Respect the institution's terms, copyright controls, download limits, and robots or rate limits.
+Use this workflow only for resources the user is authorized to access. Select and verify a browser backend with `browser-access.md`; apply `safety-and-recovery.md`, including browser locking, stop/retry rules, storage preflight, and download caps. Respect the institution's terms, copyright controls, download limits, and robots or rate limits.
 
 ## Authentication boundary
 
@@ -16,7 +16,7 @@ Use this workflow only for resources the user is authorized to access. Apply `sa
 2. Ask the user to choose the school e-library, public scholarly sources, or both when external retrieval is needed and no choice is stored. Treat Google Scholar and similar indexes as discovery tools rather than verified full-text sources.
 3. Open the item record and verify title, authors, publication, year, identifiers, and full-text availability.
 4. Download only when the interface permits it and the download is relevant to the task. Avoid bulk harvesting.
-5. Save task-specific documents under the assignment source folder; save reusable course holdings under the course library folder.
+5. Receive downloads through the selected backend's documented event/path interface or a controlled directory snapshot. Record the remote-to-local mapping before organizing files. Save task-specific documents under the assignment source folder; save reusable course holdings under the course library folder.
 6. Verify that each downloaded file opens, is complete, and matches the item record.
 7. Register provenance and citation metadata; record inaccessible items without fabricating content.
 

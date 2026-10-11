@@ -88,9 +88,23 @@ class RepositoryTests(unittest.TestCase):
             "events.jsonl",
             "workspace_config.json",
             "course_catalog.json",
+            "course_manifest.json",
             "remote_inventory.json",
             "local_inventory.json",
             "sync_state.json",
+            "browser_session.json",
+            "download_map.json",
+            "browser.lock",
+            "run_history",
+            "verification_report.json",
+            "artifact_validation.json",
+            "source_policy_validation.json",
+            "citation_audit.json",
+            "sensitive_artifact_scan.json",
+            "diagnostic_report.md",
+            "missing_materials.md",
+            "missing_materials.json",
+            "sync_results.csv",
         }
         violations = [
             str(path.relative_to(ROOT))
@@ -98,6 +112,7 @@ class RepositoryTests(unittest.TestCase):
             if path.name in forbidden_names
         ]
         self.assertEqual(violations, [])
+        self.assertFalse((ROOT / "docs" / "browser-test-report.md").exists())
 
     def test_no_binary_course_materials(self) -> None:
         blocked_extensions = {

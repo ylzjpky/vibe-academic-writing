@@ -11,7 +11,7 @@ import re
 import tempfile
 import unicodedata
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
@@ -256,6 +256,8 @@ def basic_file_integrity(path: Path) -> tuple[str, str]:
     if size == 0:
         return "local_corrupt", "File is empty"
     extension = path.suffix.lower()
+    if extension in {".crdownload", ".part", ".partial", ".download", ".tmp"}:
+        return "local_corrupt", "Browser download is still incomplete"
     if extension in MACRO_EXTENSIONS:
         return "unsafe_macro", "Macro-enabled Office files require explicit user review and must not be executed"
     if extension in ARCHIVE_EXTENSIONS:
@@ -272,7 +274,54 @@ def basic_file_integrity(path: Path) -> tuple[str, str]:
     return "verified", ""
 
 
+def normalized_name(value: Any) -> str:
+    return PurePosixPath(str(value or "").replace("\\", "/")).name.casefold()
+
+
+def pick_match(remote: dict[str, Any], local: list[dict[str, Any]], used: set[int]) -> int | None:
+    """Match one material without weakening an explicit identity or path."""
+    remote_id = str(remote.get("remote_item_id") or remote.get("remote_id") or "")
+    url = str(remote.get("clean_url") or remote.get("url") or "")
+    name = normalized_name(remote.get("name"))
+    available = []
+    for index, item in enumerate(local):
+        item_id = str(item.get("remote_item_id") or item.get("remote_id") or "")
+        if index in used or (remote_id and item_id and remote_id != item_id):
+            continue
+        available.append((index, item))
+    local_path = str(remote.get("local_path") or "").replace("\\", "/")
+    if local_path:
+        candidates = [index for index, item in available if str(item.get("local_path") or "").replace("\\", "/") == local_path]
+        return candidates[0] if len(candidates) == 1 else None
+    criteria = (
+        lambda item: remote_id and str(item.get("remote_item_id") or item.get("remote_id") or "") == remote_id,
+        lambda item: url and str(item.get("clean_url") or item.get("url") or "") == url,
+        lambda item: name and normalized_name(item.get("remote_name") or item.get("name")) == name,
+    )
+    for position, criterion in enumerate(criteria):
+        candidates = []
+        for index, item in available:
+            if not criterion(item):
+                continue
+            if position == 2 and any(remote.get(field) and item.get(field) and remote[field] != item[field] for field in ("dashboard_path", "module_path")):
+                continue
+            candidates.append(index)
+        if len(candidates) == 1:
+            return candidates[0]
+        if len(candidates) > 1:
+            for field in ("dashboard_path", "module_path", "size_bytes"):
+                if remote.get(field) not in (None, ""):
+                    narrowed = [index for index in candidates if str(local[index].get(field)) == str(remote[field])]
+                    if len(narrowed) == 1:
+                        return narrowed[0]
+                    if narrowed:
+                        candidates = narrowed
+            return None
+    return None
+
+
 def inventory_file(path: Path, root: Path) -> dict[str, Any]:
+    ensure_under(path, root)
     status, reason = basic_file_integrity(path)
     policy = material_policy(path)
     result: dict[str, Any] = {

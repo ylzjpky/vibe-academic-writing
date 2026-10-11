@@ -16,7 +16,7 @@ Run an artifact-first academic workflow. The main agent owns user decisions, bro
 - Keep files inside the confirmed workspace. Do not claim navigation, download, verification, citation, rendering, or completion without artifact evidence.
 - Permit one browser-controlling agent at a time. Use `browser_lock.py` during authenticated work; other agents may process only safely local files.
 
-Before authenticated browsing, downloading, or failure recovery, read [references/safety-and-recovery.md](references/safety-and-recovery.md). For an unsupported surface, read [references/platform-capabilities.md](references/platform-capabilities.md) and use its safe fallback.
+Before browser research, LMS/e-library access, downloads, or browser recovery, read [references/browser-access.md](references/browser-access.md) to select Codex's built-in browser, an authorized CDP connection, or enabled computer control, then [references/safety-and-recovery.md](references/safety-and-recovery.md). Verify local download access separately from navigation. For an unsupported surface, read [references/platform-capabilities.md](references/platform-capabilities.md).
 
 ## Route with the smallest context bundle
 
@@ -44,6 +44,7 @@ Run bundled Python entrypoints with `python -B` so execution does not write byte
 2. For a new workspace or any download workflow, run `preflight_workspace.py`. A detected cloud-synced directory is blocking until the user selects local storage or explicitly acknowledges it.
 3. Read `resume_state.json` when present. Load `run_state.json` or detailed reports only if the compact state shows a blocker or stale dependency.
 4. Start or update the operation with `manage_run_state.py`. Record stage inputs and outputs as workspace-relative paths.
+   For browser operations, record backend selection and download capability in `browser_session.json`; keep runtime handles and debugging endpoints out of durable state.
 5. If a brief, source set, or approved plan changes, mark dependent stages stale and rerun only affected downstream gates.
 
 ## Intake and workspace layout

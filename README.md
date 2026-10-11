@@ -48,6 +48,7 @@ Vibe Academic Writing is not a replacement for a library catalogue, Zotero or an
 - **Two workspace modes** — handle a one-off assignment or maintain one or more long-term course workspaces.
 - **Multi-channel research** — work with public scholarly sources, an authorized institutional e-library, course materials, or a task-approved combination.
 - **Course synchronization** — validate the course-list page, preserve LMS organization, inventory observed items, verify downloaded files, and report unavailable material.
+- **Browser access choices** — use the Codex built-in browser, an authorized CDP connection, or enabled computer control for an existing user browser and native download dialogs; check capabilities before selecting or switching.
 - **Efficient resynchronization** — compare remote metadata with previous remote and verified local inventories before downloading.
 - **Source-governed writing** — normalize usable sources, build an evidence matrix, obtain plan approval, draft, and audit the result.
 - **Citation flexibility** — support APA, MLA, Chicago, Harvard, and assignment-specific styles without treating formatting as evidence verification.
@@ -70,6 +71,14 @@ flowchart TD
 ```
 
 The main agent owns user decisions, authenticated browser control, conflict resolution, and final synthesis. Subagents may process bounded local artifacts, but only one agent may control an authenticated browser at a time.
+
+### Browser and download access
+
+The Skill discovers the tools actually exposed by the host. It honors a selected browser/tab and otherwise prefers an existing authorized site session, then the built-in browser, available CDP control, or enabled computer control. These are conditional execution routes, not bundled browser drivers. The built-in profile does not automatically inherit the user's external browser login.
+
+Downloads use a documented completion event and local path when available, or a snapshot of the confirmed download directory for native UI flows. `download_map.json` associates each remote item with its actual saved path, including browser-renamed and same-name files. Partial downloads fail verification; local inventories retain remote identity and timestamps for resynchronization.
+
+CDP requires host authorization or an explicitly permitted local debugging endpoint with an existing Playwright runtime. Computer control requires an enabled host tool/plugin. The Skill does not enable permissions, start debugging ports, install Playwright, or copy cookies. Capability failures can trigger a recorded fallback; login, permission, CAPTCHA, and rate-limit failures cannot be bypassed by switching routes. See [Browser access](plugins/vibe-academic-writing/skills/develop-academic-paper/references/browser-access.md).
 
 ## Research and source model
 

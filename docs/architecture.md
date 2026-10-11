@@ -22,3 +22,5 @@ The main agent owns user decisions, authenticated browser control, conflict reso
 - Course assignment: select course, resolve course/external/mixed source scope, check snapshot currency, then reuse the single-task research and writing pipeline.
 
 Run state is persisted as compact artifacts so a later conversation can resume from verified files rather than replaying full chat history.
+
+Browser execution is routed by `references/browser-access.md`: built-in browser APIs, authorized CDP, and enabled computer control share the same inventories, download mapping, verification, and operation state. Host tools perform browser actions; the standard-library scripts validate local files and compare metadata. Capability discovery and target-session validation precede work, and backend changes do not bypass authentication or access failures.

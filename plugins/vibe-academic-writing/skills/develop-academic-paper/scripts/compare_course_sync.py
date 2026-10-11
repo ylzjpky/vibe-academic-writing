@@ -5,10 +5,9 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from pathlib import PurePosixPath
 from typing import Any
 
-from _common import SCHEMA_VERSION, now_utc, read_records, resolve_explicit, workspace_relative, write_csv, write_json, write_text
+from _common import SCHEMA_VERSION, normalized_name, now_utc, pick_match, read_records, resolve_explicit, workspace_relative, write_csv, write_json, write_text
 
 
 STATUSES = {
@@ -72,29 +71,7 @@ def parser() -> argparse.ArgumentParser:
     return value
 
 
-def normalized_name(value: Any) -> str:
-    return PurePosixPath(str(value or "").replace("\\", "/")).name.casefold()
-
-
-def pick_match(remote: dict[str, Any], local: list[dict[str, Any]], used: set[int]) -> int | None:
-    remote_id = str(remote.get("remote_item_id") or remote.get("remote_id") or "")
-    url = str(remote.get("clean_url") or remote.get("url") or "")
-    path = str(remote.get("dashboard_path") or "")
-    name = normalized_name(remote.get("name"))
-    criteria = (
-        lambda item: remote_id and str(item.get("remote_item_id") or item.get("remote_id") or "") == remote_id,
-        lambda item: url and str(item.get("clean_url") or item.get("url") or "") == url,
-        lambda item: path and name and str(item.get("dashboard_path") or "") == path and normalized_name(item.get("name")) == name,
-        lambda item: name and normalized_name(item.get("name")) == name,
-    )
-    for criterion in criteria:
-        candidates = [index for index, item in enumerate(local) if index not in used and criterion(item)]
-        if len(candidates) == 1:
-            return candidates[0]
-    return None
-
-
-def compare_one(remote: dict[str, Any], local: dict[str, Any] | None) -> tuple[str, str]:
+def compare_one(remote: dict[str, Any], local: dict[str, Any] | None, previous: dict[str, Any] | None = None) -> tuple[str, str]:
     record_role = str(remote.get("record_role") or "").lower()
     if record_role == "excluded_video" or str(remote.get("exclusion_status") or "").lower() == "excluded_video" or "video" in str(remote.get("material_type") or "").lower():
         return "excluded_video", "Video is outside the synchronization download scope"
@@ -128,10 +105,10 @@ def compare_one(remote: dict[str, Any], local: dict[str, Any] | None) -> tuple[s
     if remote_size not in (None, "") and local_size not in (None, "") and int(remote_size) != int(local_size):
         return "updated", "Remote and local sizes differ"
     remote_modified = str(remote.get("modified_at") or "")
-    local_modified = str(local.get("remote_modified_at") or "")
+    local_modified = str(local.get("remote_modified_at") or (previous or {}).get("modified_at") or "")
     if remote_modified and local_modified and remote_modified != local_modified:
         return "updated", "Remote modification timestamp changed"
-    if normalized_name(remote.get("name")) != normalized_name(local.get("name")):
+    if normalized_name(remote.get("name")) != normalized_name(local.get("remote_name") or local.get("name")):
         return "renamed", "Stable identity matched but file name changed"
     if str(remote.get("content_change_signal") or "").lower() in {"unknown", "unavailable", "insufficient"}:
         return "content_change_unknown", "The LMS exposes insufficient metadata to prove that content is unchanged"
@@ -244,7 +221,9 @@ def main() -> int:
         local_item = local[match_index] if match_index is not None else None
         if match_index is not None:
             used.add(match_index)
-        status, reason = compare_one(remote_item, local_item)
+        previous_index = pick_match(remote_item, previous_remote, set())
+        previous_item = previous_remote[previous_index] if previous_index is not None else None
+        status, reason = compare_one(remote_item, local_item, previous_item)
         if status not in STATUSES:
             raise AssertionError(status)
         results.append(result_row(status, remote_item, local_item, reason, actions.get(action_key(remote_item))))

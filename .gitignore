@@ -39,8 +39,23 @@ course_manifest.json
 remote_inventory.json
 local_inventory.json
 sync_state.json
+browser_session.json
+download_map.json
+browser.lock
+run_history/
+verification_report.json
+artifact_validation.json
+source_policy_validation.json
+citation_audit.json
+sensitive_artifact_scan.json
+diagnostic_report.md
 missing_materials.md
+missing_materials.json
+sync_results.csv
 *_result/
+
+# Local live-test record
+docs/browser-test-report.md
 
 # Archives and local release output
 dist/

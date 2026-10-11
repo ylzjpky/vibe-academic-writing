@@ -37,8 +37,8 @@ Do not place files from different courses in the same course directory. Use stab
 
 ## First synchronization
 
-1. Ask the user to sign in and navigate to the institution's course-list page.
-2. Acquire `browser.lock`, then apply the gate in `course-page-validation.md`. Do not enumerate or create course directories until the gate passes.
+1. Follow `browser-access.md` to reuse the intended session or select the built-in browser, CDP, or enabled computer control. Let the user sign in on that surface and navigate to the institution's course-list page when needed.
+2. Acquire the shared `browser.lock`, then apply the gate in `course-page-validation.md`. Do not enumerate or create course directories until the gate passes.
 3. Read the visible in-scope courses and construct a proposed catalog with course names and stable identifiers when available.
 4. Show the detected course count and names. Require user confirmation before creating or renaming course directories.
 5. Create the confirmed catalog and course directories.

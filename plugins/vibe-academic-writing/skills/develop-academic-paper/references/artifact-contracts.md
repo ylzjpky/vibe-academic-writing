@@ -96,6 +96,10 @@ Valid actions include `downloaded_new`, `downloaded_update`, `redownloaded_missi
 
 ## Run and resume state
 
+Browser operations may keep `browser_session.json` with backend (`builtin`, `cdp`, or `computer`), observed status, download method (`event`, `directory_snapshot`, or `manual`), clean target origin, and a non-secret fallback reason. Runtime tab/window handles, CDP endpoints, browser profiles, and session secrets are not durable artifacts. A recorded backend is a resume hint; rediscover current capabilities and authentication.
+
+`download_map.json` records the association observed at download time: remote item ID or original name plus breadcrumb/clean URL, and `local_path` relative to the verifier's download directory. Update paths after organization; preserve original remote names separately from browser collision suffixes. Verified local inventory rows retain `remote_item_id`, `remote_name`, `dashboard_path`, `module_path`, `clean_url`, and `remote_modified_at` for resynchronization.
+
 Each substantial task, synchronization, or assignment run may keep `run_state.json`, compact `resume_state.json`, and sanitized `events.jsonl` at its operation root. `run_state.json` records `run_id`, mode, operation, overall status, current stage, last successful checkpoint, timestamps, and stage records with status, attempts, workspace-relative inputs/outputs, stable error code, short message, and recovery hint. `resume_state.json` contains only the fields required to resume plus blockers and recent key artifacts.
 
 Events are append-only operational metadata. Never put prompts, course/source text, bibliographic content, credentials, signed URLs, authorization data, or absolute paths in an event. Missing or partial state is diagnosed; it is never proof a stage succeeded.
